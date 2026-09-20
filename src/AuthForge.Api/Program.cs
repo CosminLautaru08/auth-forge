@@ -1,16 +1,24 @@
 using AuthForge.Application.Security;
 using AuthForge.Infrastructure.Security;
+using AuthForge.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+
+builder.Services.AddDbContext<AuthForgeDbContext>(options =>
+{
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("AuthForge")
+    );
+});
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -19,7 +27,5 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapHealthChecks("/health");
-builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
 app.Run();
-
