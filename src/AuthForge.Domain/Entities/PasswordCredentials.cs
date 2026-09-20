@@ -1,12 +1,12 @@
 namespace AuthForge.Domain.Entities;
 
-public class PasswordCredentials
+public class PasswordCredential
 {
     public Guid UserId { get; private set; }
 
     public string PasswordHash { get; private set; }
 
-    public PasswordCredentials(Guid userId, string passwordHash)
+    public PasswordCredential(Guid userId, string passwordHash)
     {
         if (userId == Guid.Empty)
         {

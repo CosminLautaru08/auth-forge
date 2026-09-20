@@ -1,5 +1,6 @@
 using AuthForge.Application.Security;
 using AuthForge.Domain.Entities;
+using AuthForge.Application.Users;
 
 namespace AuthForge.Application.Users;
 
@@ -12,8 +13,18 @@ public class RegisterUser
         _passwordHasher = passwordHasher;
     }
 
-    public User Execute(string email)
+    public RegistrationResult Execute(string email, string password)
     {
-        return new User(email);
+        var user = new User(email);
+
+        var passwordHash = _passwordHasher.Hash(password);
+
+        var passwordCredential = new PasswordCredential(
+            user.Id,
+            passwordHash);
+
+        return new RegistrationResult(
+            user,
+            passwordCredential);
     }
 }

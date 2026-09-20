@@ -11,11 +11,14 @@ public class RegisterUserTests
     {
         var registerUser = new RegisterUser(new FakePasswordHasher());
 
-        var user = registerUser.Execute("user@example.com");
+        var result = registerUser.Execute("user@example.com", "password123");
 
-        Assert.Equal("user@example.com", user.Email);
-        Assert.Equal(UserStatus.Active, user.Status);
-        Assert.NotEqual(Guid.Empty, user.Id);
+        Assert.Equal(
+            result.User.Id,
+            result.PasswordCredential.UserId);
+        Assert.Equal(
+        "hashed:password123",
+        result.PasswordCredential.PasswordHash);
     }
 
     [Fact]
@@ -24,8 +27,7 @@ public class RegisterUserTests
         var registerUser = new RegisterUser(new FakePasswordHasher());
 
         Assert.Throws<ArgumentException>(() =>
-            registerUser.Execute("")
-        );
+             registerUser.Execute("", "password123"));
     }
 
     private class FakePasswordHasher : IPasswordHasher
