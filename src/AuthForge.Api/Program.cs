@@ -1,3 +1,6 @@
+using AuthForge.Application.Security;
+using AuthForge.Infrastructure.Security;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -16,6 +19,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapHealthChecks("/health");
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
 app.Run();
 
