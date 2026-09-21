@@ -23,6 +23,10 @@ public class AuthForgeDbContext : DbContext
         modelBuilder.Entity<User>()
         .HasKey(user => user.Id);
 
+        modelBuilder.Entity<User>()
+        .HasIndex(user => user.Email)
+        .IsUnique();
+
         modelBuilder.Entity<PasswordCredential>()
         .HasKey(credential => credential.UserId);
 
