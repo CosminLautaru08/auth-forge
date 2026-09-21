@@ -12,7 +12,7 @@ public class RegistrationRepository : IRegistrationRepository
         _dbContext = dbContext;
     }
 
-    public async Task AddSync(
+    public async Task AddAsync(
         User user,
         PasswordCredential passwordCredential,
         CancellationToken cancellationToken = default
