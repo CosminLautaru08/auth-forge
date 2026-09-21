@@ -49,6 +49,27 @@ public class RegisterUserTests
             registerUser.ExecuteAsync("", "password123"));
     }
 
+    [Fact]
+    public async Task ExecuteAsync_WithExistingEmail_ThrowsInvalidOperationException()
+    {
+        var repository = new FakeRegistrationRepository
+        {
+            ExistingEmail = "user@example.com"
+        };
+
+        var registerUser = new RegisterUser(
+            new FakePasswordHasher(),
+            repository
+        );
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+        registerUser.ExecuteAsync(
+            "user@example.com",
+            "password123"
+        ));
+    }
+
+
     private class FakePasswordHasher : IPasswordHasher
     {
         public string Hash(string password)
@@ -64,9 +85,21 @@ public class RegisterUserTests
 
     private class FakeRegistrationRepository : IRegistrationRepository
     {
+        public string? ExistingEmail { get; set; }
+
         public User? User { get; private set; }
 
         public PasswordCredential? PasswordCredential { get; private set; }
+
+        public Task<bool> ExistsByEmailAsync(
+        string email,
+        CancellationToken cancellationToken = default)
+        {
+            _ = cancellationToken;
+
+            return Task.FromResult(
+                ExistingEmail == email);
+        }
 
         public Task AddAsync(
             User user,

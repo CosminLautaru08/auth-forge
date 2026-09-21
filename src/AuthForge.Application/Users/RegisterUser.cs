@@ -20,6 +20,16 @@ public class RegisterUser
         CancellationToken cancellationToken = default
     )
     {
+
+        var emailExists = await _registrationRepository.ExistsByEmailAsync(
+            email,
+            cancellationToken);
+
+        if (emailExists)
+        {
+            throw new InvalidOperationException("A user with this email already exists.");
+        }
+
         var user = new User(email);
 
         var passwordHash = _passwordHasher.Hash(password);
