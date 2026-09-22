@@ -13,6 +13,7 @@ builder.Services.AddHealthChecks();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IRegistrationRepository, RegistrationRepository>();
 builder.Services.AddScoped<RegisterUser>();
+builder.Services.AddScoped<ILoginRepository, LoginRepository>();
 
 builder.Services.AddDbContext<AuthForgeDbContext>(options =>
 {
