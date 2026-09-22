@@ -30,6 +30,13 @@ public class AuthForgeDbContext : DbContext
         modelBuilder.Entity<PasswordCredential>()
         .HasKey(credential => credential.UserId);
 
+        modelBuilder.Entity<PasswordCredential>()
+        .HasOne<User>()
+        .WithOne()
+        .HasForeignKey<PasswordCredential>(
+                credential => credential.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+
     }
 }
 
