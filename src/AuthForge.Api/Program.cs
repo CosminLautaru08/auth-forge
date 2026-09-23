@@ -14,6 +14,7 @@ builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IRegistrationRepository, RegistrationRepository>();
 builder.Services.AddScoped<RegisterUser>();
 builder.Services.AddScoped<ILoginRepository, LoginRepository>();
+builder.Services.AddScoped<LoginUser>();
 
 builder.Services.AddDbContext<AuthForgeDbContext>(options =>
 {
@@ -47,6 +48,32 @@ app.MapPost("/users", async (
         new RegisterUserResponse(
             result.User.Id,
             result.User.Email));
+});
+
+app.MapPost("/login", async (
+    LoginUserRequest request,
+    LoginUser loginUser,
+    CancellationToken cancellationToken
+) =>
+{
+    try
+    {
+        var user = await loginUser.ExecuteAsync(
+            request.Email,
+            request.Password,
+            cancellationToken
+        );
+
+        return Results.Ok(
+            new LoginUserResponse(
+                user.Id,
+                user.Email
+            ));
+    }
+    catch (InvalidOperationException)
+    {
+        return Results.Unauthorized();
+    }
 });
 
 app.Run();
