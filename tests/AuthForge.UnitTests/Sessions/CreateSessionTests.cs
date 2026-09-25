@@ -39,5 +39,15 @@ public class CreateSessionTests
 
             return Task.CompletedTask;
         }
+
+        public Task<UserSession?> FindByIdAsync(
+            Guid sessionId,
+            CancellationToken cancellationToken = default)
+        {
+            _ = sessionId;
+            _ = cancellationToken;
+
+            return Task.FromResult<UserSession?>(Session);
+        }
     }
 }

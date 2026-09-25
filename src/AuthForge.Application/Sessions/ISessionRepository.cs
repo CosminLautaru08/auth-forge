@@ -8,4 +8,8 @@ public interface ISessionRepository
         UserSession session,
         CancellationToken cancellationToken = default
     );
+
+    Task<UserSession?> FindByIdAsync(
+    Guid sessionId,
+    CancellationToken cancellationToken = default);
 }

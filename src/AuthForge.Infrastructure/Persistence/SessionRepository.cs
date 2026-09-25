@@ -1,5 +1,6 @@
 using AuthForge.Application.Sessions;
 using AuthForge.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuthForge.Infrastructure.Persistence;
 
@@ -23,5 +24,15 @@ public class SessionRepository : ISessionRepository
         );
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<UserSession?> FindByIdAsync(
+    Guid sessionId,
+    CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.UserSessions
+            .FirstOrDefaultAsync(
+                session => session.Id == sessionId,
+                cancellationToken);
     }
 }

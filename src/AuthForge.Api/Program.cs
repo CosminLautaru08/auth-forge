@@ -18,6 +18,8 @@ builder.Services.AddScoped<ILoginRepository, LoginRepository>();
 builder.Services.AddScoped<LoginUser>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 builder.Services.AddScoped<ICreateSession, CreateSession>();
+builder.Services.AddScoped<ValidateSession>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddDbContext<AuthForgeDbContext>(options =>
 {
@@ -72,6 +74,54 @@ app.MapPost("/login", async (
                session.Id,
                 session.ExpiresAt
             ));
+    }
+    catch (InvalidOperationException)
+    {
+        return Results.Unauthorized();
+    }
+});
+
+app.MapGet("/me", async (
+    HttpRequest httpRequest,
+    ValidateSession validateSession,
+    IUserRepository userRepository,
+    CancellationToken cancellationToken
+) =>
+{
+    var authorization = httpRequest.Headers.Authorization.ToString();
+
+    if (!authorization.StartsWith("Bearer "))
+    {
+        return Results.Unauthorized();
+    }
+
+    var sessionIdText = authorization["Bearer ".Length..];
+
+    if (!Guid.TryParse(sessionIdText, out var sessionId))
+    {
+        return Results.Unauthorized();
+    }
+
+    try
+    {
+        var session = await validateSession.ExecuteAsync(
+            sessionId,
+            cancellationToken);
+
+        var user = await userRepository.FindByIdAsync(
+            session.UserId,
+            cancellationToken);
+
+        if (user is null)
+        {
+            return Results.Unauthorized();
+        }
+
+        return Results.Ok(new
+        {
+            user.Id,
+            user.Email
+        });
     }
     catch (InvalidOperationException)
     {
