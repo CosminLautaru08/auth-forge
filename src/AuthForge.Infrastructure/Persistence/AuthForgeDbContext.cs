@@ -15,6 +15,8 @@ public class AuthForgeDbContext : DbContext
 
     public DbSet<PasswordCredential> PasswordCredentials => Set<PasswordCredential>();
 
+    public DbSet<UserSession> UserSessions => Set<UserSession>();
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,7 +39,11 @@ public class AuthForgeDbContext : DbContext
                 credential => credential.UserId)
         .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<UserSession>()
+        .HasKey(session => session.Id);
+
     }
+
 }
 
 

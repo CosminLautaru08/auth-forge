@@ -4,6 +4,7 @@ using AuthForge.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using AuthForge.Application.Users;
 using AuthForge.Api.Users;
+using AuthForge.Application.Sessions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,7 @@ builder.Services.AddScoped<IRegistrationRepository, RegistrationRepository>();
 builder.Services.AddScoped<RegisterUser>();
 builder.Services.AddScoped<ILoginRepository, LoginRepository>();
 builder.Services.AddScoped<LoginUser>();
+builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 
 builder.Services.AddDbContext<AuthForgeDbContext>(options =>
 {
