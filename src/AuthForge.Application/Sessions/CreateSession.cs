@@ -2,7 +2,7 @@ using AuthForge.Domain.Entities;
 
 namespace AuthForge.Application.Sessions;
 
-public class CreateSession
+public class CreateSession : ICreateSession
 {
     private readonly ISessionRepository _sessionRepository;
 

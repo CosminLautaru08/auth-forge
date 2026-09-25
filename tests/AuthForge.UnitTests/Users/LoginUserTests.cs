@@ -1,4 +1,5 @@
 using AuthForge.Application.Security;
+using AuthForge.Application.Sessions;
 using AuthForge.Application.Users;
 using AuthForge.Domain.Entities;
 using AuthForge.Domain.Enums;
@@ -8,7 +9,7 @@ namespace AuthForge.UnitTests.Users;
 public class LoginUserTests
 {
     [Fact]
-    public async Task ExecuteAsync_WithValidCredentials_ReturnsUser()
+    public async Task ExecuteAsync_WithValidCredentials_ReturnsSession()
     {
         var user = new User("user@example.com");
 
@@ -22,23 +23,34 @@ public class LoginUserTests
             PasswordCredential = credential
         };
 
+        var createSession = new FakeCreateSession();
+        var passwordHasher = new FakePasswordHasher();
+
         var loginUser = new LoginUser(
-            new FakePasswordHasher(),
-            repository);
+            passwordHasher,
+            repository,
+            createSession);
 
         var result = await loginUser.ExecuteAsync(
             "user@example.com",
             "password123");
 
-        Assert.Same(user, result);
+        Assert.NotNull(result);
+        Assert.Equal(user.Id, result.UserId);
+        Assert.Same(result, createSession.Session);
     }
 
     [Fact]
     public async Task ExecuteAsync_WithUnknownEmail_ThrowsInvalidOperationException()
     {
+        var passwordHasher = new FakePasswordHasher();
+        var repository = new FakeLoginRepository();
+        var createSession = new FakeCreateSession();
+
         var loginUser = new LoginUser(
-            new FakePasswordHasher(),
-            new FakeLoginRepository());
+            passwordHasher,
+            repository,
+            createSession);
 
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
             loginUser.ExecuteAsync(
@@ -65,9 +77,13 @@ public class LoginUserTests
             PasswordCredential = credential
         };
 
+        var passwordHasher = new FakePasswordHasher();
+        var createSession = new FakeCreateSession();
+
         var loginUser = new LoginUser(
-            new FakePasswordHasher(),
-            repository);
+        passwordHasher,
+        repository,
+        createSession);
 
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
             loginUser.ExecuteAsync(
@@ -95,9 +111,13 @@ public class LoginUserTests
             PasswordCredential = credential
         };
 
+        var passwordHasher = new FakePasswordHasher();
+        var createSession = new FakeCreateSession();
+
         var loginUser = new LoginUser(
-            new FakePasswordHasher(),
-            repository);
+            passwordHasher,
+            repository,
+            createSession);
 
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
             loginUser.ExecuteAsync(
@@ -149,6 +169,29 @@ public class LoginUserTests
             return Task.FromResult<
                 (User User, PasswordCredential PasswordCredential)?>(
                     (User, PasswordCredential));
+        }
+    }
+
+    private class FakeCreateSession : ICreateSession
+    {
+        public UserSession? Session { get; private set; }
+
+        public Task<UserSession> ExecuteAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default)
+        {
+            _ = cancellationToken;
+
+            var now = DateTime.UtcNow;
+
+            var session = new UserSession(
+                userId,
+                now,
+                now.AddHours(1));
+
+            Session = session;
+
+            return Task.FromResult(session);
         }
     }
 }

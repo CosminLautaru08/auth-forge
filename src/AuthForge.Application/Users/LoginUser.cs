@@ -1,4 +1,5 @@
 using AuthForge.Application.Security;
+using AuthForge.Application.Sessions;
 using AuthForge.Domain.Entities;
 using AuthForge.Domain.Enums;
 
@@ -11,16 +12,20 @@ public class LoginUser
     private readonly IPasswordHasher _passwordHasher;
     private readonly ILoginRepository _loginRepository;
 
+    private readonly ICreateSession _createSession;
+
     public LoginUser(
         IPasswordHasher passwordHasher,
-        ILoginRepository loginRepository
+        ILoginRepository loginRepository,
+        ICreateSession createSession
     )
     {
         _passwordHasher = passwordHasher;
         _loginRepository = loginRepository;
+        _createSession = createSession;
     }
 
-    public async Task<User> ExecuteAsync(
+    public async Task<UserSession> ExecuteAsync(
         string email,
         string password,
         CancellationToken cancellationToken = default
@@ -53,6 +58,11 @@ public class LoginUser
             throw new InvalidOperationException("Invalid email or password.");
         }
 
-        return user;
+        var session = await _createSession.ExecuteAsync(
+            user.Id,
+            cancellationToken
+        );
+
+        return session;
     }
 }

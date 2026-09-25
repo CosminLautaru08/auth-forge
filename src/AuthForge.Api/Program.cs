@@ -17,6 +17,7 @@ builder.Services.AddScoped<RegisterUser>();
 builder.Services.AddScoped<ILoginRepository, LoginRepository>();
 builder.Services.AddScoped<LoginUser>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+builder.Services.AddScoped<ICreateSession, CreateSession>();
 
 builder.Services.AddDbContext<AuthForgeDbContext>(options =>
 {
@@ -60,7 +61,7 @@ app.MapPost("/login", async (
 {
     try
     {
-        var user = await loginUser.ExecuteAsync(
+        var session = await loginUser.ExecuteAsync(
             request.Email,
             request.Password,
             cancellationToken
@@ -68,8 +69,8 @@ app.MapPost("/login", async (
 
         return Results.Ok(
             new LoginUserResponse(
-                user.Id,
-                user.Email
+               session.Id,
+                session.ExpiresAt
             ));
     }
     catch (InvalidOperationException)
