@@ -8,6 +8,8 @@ using AuthForge.Application.Sessions;
 using AuthForge.Api.Authentication;
 using AuthForge.Domain.Entities;
 using AuthForge.Api.DependencyInjection;
+using AuthForge.Application.Authorization;
+using AuthForge.Domain.Enums;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,6 +87,71 @@ app.MapGet("/me", (HttpContext context) =>
         user.Id,
         user.Email
     });
+});
+
+app.MapGet("/admin", (
+    HttpContext context,
+    IAuthorizationService authorizationService
+) =>
+{
+    if (!context.Items.TryGetValue("User", out var value)
+        || value is not User user)
+    {
+        return Results.Unauthorized();
+    }
+
+    if (!authorizationService.HasPermission(
+         user,
+         Permission.AccessAdminArea))
+    {
+        return Results.StatusCode(StatusCodes.Status403Forbidden);
+    }
+
+    return Results.Ok(new
+    {
+        message = "Welcome to the admin area."
+    });
+});
+
+app.MapPost("/users/{userId:guid}/promote", async (
+    HttpContext context,
+    Guid userId,
+    PromoteUserToAdmin promoteUserToAdmin,
+    IAuthorizationService authorizationService,
+    CancellationToken cancellationToken
+) =>
+{
+    var user = context.Items["User"] as User;
+
+    if (user is null)
+    {
+        return Results.Unauthorized();
+    }
+
+    if (!authorizationService.HasPermission(
+            user,
+            Permission.ManageUsers))
+    {
+        return Results.StatusCode(StatusCodes.Status403Forbidden);
+    }
+
+    try
+    {
+        var promotedUser = await promoteUserToAdmin.ExecuteAsync(
+            userId,
+            cancellationToken);
+
+        return Results.Ok(new
+        {
+            promotedUser.Id,
+            promotedUser.Email,
+            promotedUser.Role
+        });
+    }
+    catch (InvalidOperationException)
+    {
+        return Results.NotFound();
+    }
 });
 
 app.Run();

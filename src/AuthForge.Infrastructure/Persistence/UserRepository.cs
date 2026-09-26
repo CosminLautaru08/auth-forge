@@ -22,4 +22,13 @@ public class UserRepository : IUserRepository
                 user => user.Id == userId,
                 cancellationToken);
     }
+
+    public async Task UpdateAsync(
+    User user,
+    CancellationToken cancellationToken = default)
+    {
+        _dbContext.Users.Update(user);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
 }

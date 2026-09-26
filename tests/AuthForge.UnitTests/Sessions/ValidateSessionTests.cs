@@ -153,5 +153,12 @@ public class ValidateSessionTests
 
             return Task.FromResult(User);
         }
+
+        public Task UpdateAsync(
+            User user,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

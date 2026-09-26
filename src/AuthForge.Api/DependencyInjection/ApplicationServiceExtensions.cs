@@ -1,7 +1,6 @@
-using AuthForge.Application.Security;
+using AuthForge.Application.Authorization;
 using AuthForge.Application.Sessions;
 using AuthForge.Application.Users;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace AuthForge.Api.DependencyInjection;
 
@@ -15,6 +14,9 @@ public static class ApplicationServiceExtentions
         services.AddScoped<LoginUser>();
         services.AddScoped<ICreateSession, CreateSession>();
         services.AddScoped<ValidateSession>();
+        services.AddScoped<IAuthorizationService, AuthorizationService>();
+        services.AddScoped<PromoteUserToAdmin>();
+
 
         return services;
     }

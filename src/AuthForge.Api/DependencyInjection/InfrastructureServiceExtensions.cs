@@ -23,6 +23,7 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<ISessionRepository, SessionRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
 
+
         services.AddDbContext<AuthForgeDbContext>(options =>
        {
            options.UseNpgsql(

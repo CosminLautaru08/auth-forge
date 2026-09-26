@@ -6,5 +6,11 @@ public interface IUserRepository
 {
     Task<User?> FindByIdAsync(
         Guid userId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+        );
+
+    Task UpdateAsync(
+        User user,
+        CancellationToken cancellationToken = default
+        );
 }
