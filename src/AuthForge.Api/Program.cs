@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using AuthForge.Application.Users;
 using AuthForge.Api.Users;
 using AuthForge.Application.Sessions;
+using AuthForge.Api.Authentication;
+using AuthForge.Domain.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +31,8 @@ builder.Services.AddDbContext<AuthForgeDbContext>(options =>
 });
 
 var app = builder.Build();
+
+app.UseMiddleware<AuthenticationMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
@@ -81,52 +85,19 @@ app.MapPost("/login", async (
     }
 });
 
-app.MapGet("/me", async (
-    HttpRequest httpRequest,
-    ValidateSession validateSession,
-    IUserRepository userRepository,
-    CancellationToken cancellationToken
-) =>
+app.MapGet("/me", (HttpContext context) =>
 {
-    var authorization = httpRequest.Headers.Authorization.ToString();
-
-    if (!authorization.StartsWith("Bearer "))
+    if (!context.Items.TryGetValue("User", out var value)
+        || value is not User user)
     {
         return Results.Unauthorized();
     }
 
-    var sessionIdText = authorization["Bearer ".Length..];
-
-    if (!Guid.TryParse(sessionIdText, out var sessionId))
+    return Results.Ok(new
     {
-        return Results.Unauthorized();
-    }
-
-    try
-    {
-        var session = await validateSession.ExecuteAsync(
-            sessionId,
-            cancellationToken);
-
-        var user = await userRepository.FindByIdAsync(
-            session.UserId,
-            cancellationToken);
-
-        if (user is null)
-        {
-            return Results.Unauthorized();
-        }
-
-        return Results.Ok(new
-        {
-            user.Id,
-            user.Email
-        });
-    }
-    catch (InvalidOperationException)
-    {
-        return Results.Unauthorized();
-    }
+        user.Id,
+        user.Email
+    });
 });
 
 app.Run();
