@@ -7,28 +7,15 @@ using AuthForge.Api.Users;
 using AuthForge.Application.Sessions;
 using AuthForge.Api.Authentication;
 using AuthForge.Domain.Entities;
+using AuthForge.Api.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 
-builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
-builder.Services.AddScoped<IRegistrationRepository, RegistrationRepository>();
-builder.Services.AddScoped<RegisterUser>();
-builder.Services.AddScoped<ILoginRepository, LoginRepository>();
-builder.Services.AddScoped<LoginUser>();
-builder.Services.AddScoped<ISessionRepository, SessionRepository>();
-builder.Services.AddScoped<ICreateSession, CreateSession>();
-builder.Services.AddScoped<ValidateSession>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-
-builder.Services.AddDbContext<AuthForgeDbContext>(options =>
-{
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("AuthForge")
-    );
-});
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
