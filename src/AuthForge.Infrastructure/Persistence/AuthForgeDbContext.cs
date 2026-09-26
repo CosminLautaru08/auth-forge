@@ -1,5 +1,5 @@
-using System.Security.Cryptography.X509Certificates;
 using AuthForge.Domain.Entities;
+using AuthForge.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuthForge.Infrastructure.Persistence;
@@ -23,11 +23,16 @@ public class AuthForgeDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<User>()
-        .HasKey(user => user.Id);
+    .HasKey(user => user.Id);
 
         modelBuilder.Entity<User>()
-        .HasIndex(user => user.Email)
-        .IsUnique();
+            .HasIndex(user => user.Email)
+            .IsUnique();
+
+        modelBuilder.Entity<User>()
+            .Property(user => user.Role)
+            .HasConversion<int>()
+            .HasDefaultValue(UserRole.User);
 
         modelBuilder.Entity<PasswordCredential>()
         .HasKey(credential => credential.UserId);

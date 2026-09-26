@@ -25,4 +25,22 @@ public class UserTests
 
         Assert.Equal(UserStatus.Active, user.Status);
     }
+
+    [Fact]
+    public void Constructor_DefaultsToUserRole()
+    {
+        var user = new User("user@example.com");
+
+        Assert.Equal(UserRole.User, user.Role);
+    }
+
+    [Fact]
+    public void PromoteToAdmin_ChangesRoleToAdmin()
+    {
+        var user = new User("user@example.com");
+
+        user.PromoteToAdmin();
+
+        Assert.Equal(UserRole.Admin, user.Role);
+    }
 }
