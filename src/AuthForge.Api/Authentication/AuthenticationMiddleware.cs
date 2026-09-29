@@ -40,6 +40,7 @@ public class AuthenticationMiddleware
                     if (user is not null)
                     {
                         context.Items["User"] = user;
+                        context.Items["Session"] = session;
                     }
                 }
                 catch (InvalidOperationException)

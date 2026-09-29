@@ -6,9 +6,12 @@ namespace AuthForge.IntegrationTests.Infrastructure;
 
 public sealed class PostgresFixture : IAsyncLifetime
 {
+
     private readonly PostgreSqlContainer _container =
         new PostgreSqlBuilder("postgres:15.1")
             .Build();
+    public string ConnectionString => _container.GetConnectionString();
+
 
     public AuthForgeDbContext CreateDbContext()
     {

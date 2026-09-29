@@ -74,6 +74,39 @@ app.MapPost("/login", async (
     }
 });
 
+app.MapPost("/sessions/revoke", async (
+    HttpContext context,
+    RevokeSession revokeSession,
+    CancellationToken cancellationToken
+) =>
+{
+    if (!context.Items.TryGetValue("User", out var userValue)
+        || userValue is not User user)
+    {
+        return Results.Unauthorized();
+    }
+
+    if (!context.Items.TryGetValue("Session", out var sessionValue)
+        || sessionValue is not UserSession session)
+    {
+        return Results.Unauthorized();
+    }
+
+    try
+    {
+        await revokeSession.ExecuteAsync(
+            session.Id,
+            user.Id,
+            cancellationToken);
+
+        return Results.Ok();
+    }
+    catch (InvalidOperationException)
+    {
+        return Results.Unauthorized();
+    }
+});
+
 app.MapGet("/me", (HttpContext context) =>
 {
     if (!context.Items.TryGetValue("User", out var value)
@@ -154,3 +187,4 @@ app.MapPost("/users/{userId:guid}/promote", async (
 });
 
 app.Run();
+
