@@ -81,7 +81,6 @@ app.MapGet("/me", (HttpContext context) =>
     {
         return Results.Unauthorized();
     }
-
     return Results.Ok(new
     {
         user.Id,

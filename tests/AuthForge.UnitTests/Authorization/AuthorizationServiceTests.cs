@@ -48,4 +48,17 @@ public class AuthorizationServiceTests
 
         Assert.True(result);
     }
+
+    [Fact]
+    public void HasPermission_WithRegularUser_CannotManageUsers()
+    {
+        var user = new User("user@example.com");
+        var authorizationService = new AuthorizationService();
+
+        var result = authorizationService.HasPermission(
+            user,
+            Permission.ManageUsers);
+
+        Assert.False(result);
+    }
 }
