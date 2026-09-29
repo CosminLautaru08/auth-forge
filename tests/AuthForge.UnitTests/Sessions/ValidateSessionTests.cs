@@ -116,6 +116,40 @@ public class ValidateSessionTests
       exception.Message);
     }
 
+    [Fact]
+    public async Task ExecuteAsync_WithRevokedSession_ThrowsInvalidOperationException()
+    {
+        var user = new User("user@example.com");
+
+        var session = new UserSession(
+            user.Id,
+            DateTime.UtcNow,
+            DateTime.UtcNow.AddHours(1));
+
+        session.Revoke();
+
+        var sessionRepository = new FakeSessionRepository
+        {
+            Session = session
+        };
+
+        var userRepository = new FakeUserRepository
+        {
+            User = user
+        };
+
+        var validateSession = new ValidateSession(
+            sessionRepository,
+            userRepository);
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            validateSession.ExecuteAsync(session.Id));
+
+        Assert.Equal(
+            "Session has been revoked.",
+            exception.Message);
+    }
+
     private class FakeSessionRepository : ISessionRepository
     {
         public UserSession? Session { get; set; }

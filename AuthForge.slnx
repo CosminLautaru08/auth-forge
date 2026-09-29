@@ -6,6 +6,7 @@
     <Project Path="src/AuthForge.Infrastructure/AuthForge.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/AuthForge.IntegrationTests/AuthForge.IntegrationTests.csproj" />
     <Project Path="tests/AuthForge.UnitTests/AuthForge.UnitTests.csproj" />
   </Folder>
 </Solution>

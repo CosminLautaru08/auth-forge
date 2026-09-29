@@ -10,6 +10,8 @@ public class UserSession
 
     public DateTime ExpiresAt { get; private set; }
 
+    public DateTime? RevokedAt { get; private set; }
+
     public UserSession(
         Guid userId,
         DateTime createdAt,
@@ -36,5 +38,10 @@ public class UserSession
         UserId = userId;
         CreatedAt = createdAt;
         ExpiresAt = expiresAt;
+    }
+
+    public void Revoke()
+    {
+        RevokedAt = DateTime.UtcNow;
     }
 }

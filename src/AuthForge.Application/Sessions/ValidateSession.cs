@@ -34,6 +34,11 @@ public class ValidateSession
             throw new InvalidOperationException("Session has expired.");
         }
 
+        if (session.RevokedAt.HasValue)
+        {
+            throw new InvalidOperationException("Session has been revoked.");
+        }
+
         var user = await _userRepository.FindByIdAsync(
            session.UserId,
            cancellationToken);
