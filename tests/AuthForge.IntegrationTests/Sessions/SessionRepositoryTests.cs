@@ -76,4 +76,31 @@ public class SessionRepositoryTests
         Assert.Equal(session.CreatedAt, result.CreatedAt);
         Assert.Equal(session.ExpiresAt, result.ExpiresAt);
     }
+
+    [Fact]
+    public async Task UpdateAsync_WithRevokedSession_PersistsRevocation()
+    {
+        await using var dbContext = _fixture.CreateDbContext();
+
+        var session = new UserSession(
+            Guid.NewGuid(),
+            DateTime.UtcNow,
+            DateTime.UtcNow.AddHours(1));
+
+        var repository = new SessionRepository(dbContext);
+
+        await repository.AddAsync(session);
+
+        session.Revoke();
+
+        await repository.UpdateAsync(session);
+
+        await using var verificationContext = _fixture.CreateDbContext();
+
+        var persistedSession =
+            await verificationContext.UserSessions.FindAsync(session.Id);
+
+        Assert.NotNull(persistedSession);
+        Assert.NotNull(persistedSession.RevokedAt);
+    }
 }

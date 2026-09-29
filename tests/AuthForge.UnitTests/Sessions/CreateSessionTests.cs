@@ -49,5 +49,15 @@ public class CreateSessionTests
 
             return Task.FromResult<UserSession?>(Session);
         }
+
+        public Task UpdateAsync(
+    UserSession session,
+    CancellationToken cancellationToken = default)
+        {
+            _ = session;
+            _ = cancellationToken;
+
+            return Task.CompletedTask;
+        }
     }
 }

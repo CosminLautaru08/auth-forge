@@ -35,4 +35,13 @@ public class SessionRepository : ISessionRepository
                 session => session.Id == sessionId,
                 cancellationToken);
     }
+
+    public async Task UpdateAsync(
+    UserSession session,
+    CancellationToken cancellationToken = default)
+    {
+        _dbContext.UserSessions.Update(session);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
 }

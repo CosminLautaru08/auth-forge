@@ -10,6 +10,12 @@ public interface ISessionRepository
     );
 
     Task<UserSession?> FindByIdAsync(
-    Guid sessionId,
-    CancellationToken cancellationToken = default);
+        Guid sessionId,
+        CancellationToken cancellationToken = default
+    );
+
+    Task UpdateAsync(
+        UserSession session,
+        CancellationToken cancellationToken = default
+    );
 }
