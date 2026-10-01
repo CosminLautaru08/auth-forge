@@ -16,6 +16,7 @@ public static class ApplicationServiceExtentions
         services.AddScoped<ValidateSession>();
         services.AddScoped<IAuthorizationService, AuthorizationService>();
         services.AddScoped<PromoteUserToAdmin>();
+        services.AddScoped<RevokeSession>();
 
 
         return services;

@@ -10,6 +10,7 @@ using AuthForge.Domain.Entities;
 using AuthForge.Api.DependencyInjection;
 using AuthForge.Application.Authorization;
 using AuthForge.Domain.Enums;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,21 +77,16 @@ app.MapPost("/login", async (
 
 app.MapPost("/sessions/revoke", async (
     HttpContext context,
-    RevokeSession revokeSession,
-    CancellationToken cancellationToken
-) =>
+    [FromServices] RevokeSession revokeSession,
+    CancellationToken cancellationToken) =>
 {
     if (!context.Items.TryGetValue("User", out var userValue)
         || userValue is not User user)
-    {
         return Results.Unauthorized();
-    }
 
     if (!context.Items.TryGetValue("Session", out var sessionValue)
         || sessionValue is not UserSession session)
-    {
         return Results.Unauthorized();
-    }
 
     try
     {
